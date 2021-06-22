@@ -16,9 +16,9 @@
 package net.objecthunter.exp4j.shuntingyard;
 
 import net.objecthunter.exp4j.operator.Operator;
-import net.objecthunter.exp4j.tokenizer.Token;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,38 +26,38 @@ import java.util.Map;
 
 import static net.objecthunter.exp4j.TestUtil.*;
 
-public class ShuntingYardTest {
+class ShuntingYardTest {
 
     @Test
-    public void testShuntingYard1() {
-        String expression = "2+3";
-        Token[] tokens = ShuntingYard.convertToRPN(expression, null, null, null, true);
+    void testShuntingYard1() {
+        final var expression = "2+3";
+        final var tokens = ShuntingYard.convertToRPN(expression, null, null, null, true);
         assertNumberToken(tokens[0], 2d);
         assertNumberToken(tokens[1], 3d);
         assertOperatorToken(tokens[2], "+", 2, Operator.PRECEDENCE_ADDITION);
     }
 
     @Test
-    public void testShuntingYard2() {
-        String expression = "3*x";
-        Token[] tokens = ShuntingYard.convertToRPN(expression, null, null, new HashSet<>(Collections.singletonList("x")), true);
+    void testShuntingYard2() {
+        final var expression = "3*x";
+        final var tokens = ShuntingYard.convertToRPN(expression, null, null, new HashSet<>(Collections.singletonList("x")), true);
         assertNumberToken(tokens[0], 3d);
         assertVariableToken(tokens[1], "x");
         assertOperatorToken(tokens[2], "*", 2, Operator.PRECEDENCE_MULTIPLICATION);
     }
-
+ 
     @Test
-    public void testShuntingYard3() {
-        String expression = "-3";
-        Token[] tokens = ShuntingYard.convertToRPN(expression, null, null, null, true);
+    void testShuntingYard3() {
+        final var expression = "-3";
+        final var tokens = ShuntingYard.convertToRPN(expression, null, null, null, true);
         assertNumberToken(tokens[0], 3d);
         assertOperatorToken(tokens[1], "-", 1, Operator.PRECEDENCE_UNARY_MINUS);
     }
 
     @Test
-    public void testShuntingYard4() {
-        String expression = "-2^2";
-        Token[] tokens = ShuntingYard.convertToRPN(expression, null, null, null, true);
+    void testShuntingYard4() {
+        final var expression = "-2^2";
+        final var tokens = ShuntingYard.convertToRPN(expression, null, null, null, true);
         assertNumberToken(tokens[0], 2d);
         assertNumberToken(tokens[1], 2d);
         assertOperatorToken(tokens[2], "^", 2, Operator.PRECEDENCE_POWER);
@@ -65,9 +65,9 @@ public class ShuntingYardTest {
     }
 
     @Test
-    public void testShuntingYard5() {
-        String expression = "2^-2";
-        Token[] tokens = ShuntingYard.convertToRPN(expression, null, null, null, true);
+    void testShuntingYard5() {
+        final var expression = "2^-2";
+        final var tokens = ShuntingYard.convertToRPN(expression, null, null, null, true);
         assertNumberToken(tokens[0], 2d);
         assertNumberToken(tokens[1], 2d);
         assertOperatorToken(tokens[2], "-", 1, Operator.PRECEDENCE_UNARY_MINUS);
@@ -75,9 +75,9 @@ public class ShuntingYardTest {
     }
 
     @Test
-    public void testShuntingYard6() {
-        String expression = "2^---+2";
-        Token[] tokens = ShuntingYard.convertToRPN(expression, null, null, null, true);
+    void testShuntingYard6() {
+        final var expression = "2^---+2";
+        final var tokens = ShuntingYard.convertToRPN(expression, null, null, null, true);
         assertNumberToken(tokens[0], 2d);
         assertNumberToken(tokens[1], 2d);
         assertOperatorToken(tokens[2], "+", 1, Operator.PRECEDENCE_UNARY_PLUS);
@@ -88,29 +88,31 @@ public class ShuntingYardTest {
     }
 
     @Test
-    public void testShuntingYard7() {
-        String expression = "2^-2!";
-        Operator factorial = new Operator("!", 1, true, Operator.PRECEDENCE_POWER + 1) {
+    void testShuntingYard7() {
+        final var expression = "2^-2!";
+        final var factorial = new Operator("!", 1, true, Operator.PRECEDENCE_POWER + 1) {
 
             @Override
-            public double apply(double... args) {
-                final int arg = (int) args[0];
-                if ((double) arg != args[0]) {
-                    throw new IllegalArgumentException("Operand for factorial has to be an integer");
-                }
-                if (arg < 0) {
-                    throw new IllegalArgumentException("The operand of the factorial can not be less than zero");
-                }
-                double result = 1;
-                for (int i = 1; i <= arg; i++) {
-                    result *= i;
+            public BigDecimal apply(final BigDecimal... args) {
+                final var arg = args[0].intValue();
+/*
+        if ((double) arg != args[0]) {
+          throw new IllegalArgumentException("Operand for factorial has to be an integer");
+        }
+        if (arg < 0) {
+          throw new IllegalArgumentException("The operand of the factorial can not be less than zero");
+        }
+ */
+                var result = BigDecimal.ONE;
+                for (var i = 1; i <= arg; i++) {
+                    result = result.multiply(BigDecimal.valueOf(i));
                 }
                 return result;
             }
         };
-        Map<String, Operator> userOperators = new HashMap<>();
+        final Map<String, Operator> userOperators = new HashMap<>();
         userOperators.put("!", factorial);
-        Token[] tokens = ShuntingYard.convertToRPN(expression, null, userOperators, null, true);
+        final var tokens = ShuntingYard.convertToRPN(expression, null, userOperators, null, true);
         assertNumberToken(tokens[0], 2d);
         assertNumberToken(tokens[1], 2d);
         assertOperatorToken(tokens[2], "!", 1, Operator.PRECEDENCE_POWER + 1);
@@ -119,9 +121,9 @@ public class ShuntingYardTest {
     }
 
     @Test
-    public void testShuntingYard8() {
-        String expression = "-3^2";
-        Token[] tokens = ShuntingYard.convertToRPN(expression, null, null, null, true);
+    void testShuntingYard8() {
+        final var expression = "-3^2";
+        final var tokens = ShuntingYard.convertToRPN(expression, null, null, null, true);
         assertNumberToken(tokens[0], 3d);
         assertNumberToken(tokens[1], 2d);
         assertOperatorToken(tokens[2], "^", 2, Operator.PRECEDENCE_POWER);
@@ -129,19 +131,19 @@ public class ShuntingYardTest {
     }
 
     @Test
-    public void testShuntingYard9() {
-        Operator reciprocal = new Operator("$", 1, true, Operator.PRECEDENCE_DIVISION) {
+    void testShuntingYard9() {
+        final var reciprocal = new Operator("$", 1, true, Operator.PRECEDENCE_DIVISION) {
             @Override
-            public double apply(final double... args) {
-                if (args[0] == 0d) {
+            public BigDecimal apply(final BigDecimal... args) {
+                if (args[0].signum() == 0) {
                     throw new ArithmeticException("Division by zero!");
                 }
-                return 1d / args[0];
+                return BigDecimal.valueOf(1d / args[0].doubleValue());
             }
         };
-        Map<String, Operator> userOperators = new HashMap<>();
+        final Map<String, Operator> userOperators = new HashMap<>();
         userOperators.put("$", reciprocal);
-        Token[] tokens = ShuntingYard.convertToRPN("1$", null, userOperators, null, true);
+        final var tokens = ShuntingYard.convertToRPN("1$", null, userOperators, null, true);
         assertNumberToken(tokens[0], 1d);
         assertOperatorToken(tokens[1], "$", 1, Operator.PRECEDENCE_DIVISION);
     }

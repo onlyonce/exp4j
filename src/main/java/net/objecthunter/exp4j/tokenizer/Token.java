@@ -19,6 +19,7 @@ package net.objecthunter.exp4j.tokenizer;
  * Abstract class for tokens used by exp4j to tokenize expressions
  */
 public abstract class Token {
+
     public static final short TOKEN_NUMBER = 1;
     public static final short TOKEN_OPERATOR = 2;
     public static final short TOKEN_FUNCTION = 3;
@@ -29,7 +30,7 @@ public abstract class Token {
 
     private final int type;
 
-    Token(int type) {
+    Token(final int type) {
         this.type = type;
     }
 

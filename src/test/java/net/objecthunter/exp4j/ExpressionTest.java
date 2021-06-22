@@ -22,6 +22,7 @@ import net.objecthunter.exp4j.tokenizer.*;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -30,144 +31,146 @@ import static org.junit.Assert.*;
 
 
 public class ExpressionTest {
+
     @Test
     public void testExpression1() {
-        Token[] tokens = new Token[]{
+        final var tokens = new Token[]{
                 new NumberToken(3d),
                 new NumberToken(2d),
                 new OperatorToken(Operators.getBuiltinOperator('+', 2))
         };
-        Expression exp = new Expression(tokens);
-        assertEquals(5d, exp.evaluate(), 0d);
+        final var exp = new Expression(tokens);
+        assertEquals(5d, exp.evaluate().doubleValue(), 0d);
     }
 
     @Test
     public void testExpression2() {
-        Token[] tokens = new Token[]{
+        final var tokens = new Token[]{
                 new NumberToken(1d),
                 new FunctionToken(Functions.getBuiltinFunction("log")),
         };
-        Expression exp = new Expression(tokens);
-        assertEquals(0d, exp.evaluate(), 0d);
+        final var exp = new Expression(tokens);
+        assertEquals(0d, exp.evaluate().doubleValue(), 0d);
     }
 
     @Test
     public void testGetVariableNames1() {
-        Token[] tokens = new Token[]{
+        final var tokens = new Token[]{
                 new VariableToken("a"),
                 new VariableToken("b"),
                 new OperatorToken(Operators.getBuiltinOperator('+', 2))
         };
-        Expression exp = new Expression(tokens);
+        final var exp = new Expression(tokens);
 
         assertEquals(2, exp.getVariableNames().size());
     }
 
     @Test
     public void testFactorial() {
-        Operator factorial = new Operator("!", 1, true, Operator.PRECEDENCE_POWER + 1) {
+        final var factorial = new Operator("!", 1, true, Operator.PRECEDENCE_POWER + 1) {
 
             @Override
-            public double apply(double... args) {
-                final int arg = (int) args[0];
-                if ((double) arg != args[0]) {
-                    throw new IllegalArgumentException("Operand for factorial has to be an integer");
-                }
-                if (arg < 0) {
-                    throw new IllegalArgumentException("The operand of the factorial can not be less than zero");
-                }
-                double result = 1;
-                for (int i = 1; i <= arg; i++) {
-                    result *= i;
+            public BigDecimal apply(final BigDecimal... args) {
+                final var arg = args[0].intValue();
+/*        if ((double) arg != args[0]) {
+          throw new IllegalArgumentException("Operand for factorial has to be an integer");
+        }
+        if (arg < 0) {
+          throw new IllegalArgumentException("The operand of the factorial can not be less than zero");
+        }
+ */
+                var result = BigDecimal.ONE;
+                for (var i = 1; i <= arg; i++) {
+                    result = result.multiply(BigDecimal.valueOf(i));
                 }
                 return result;
             }
         };
 
-        Expression e = new ExpressionBuilder("2!+3!")
+        var e = new ExpressionBuilder("2!+3!")
                 .operator(factorial)
                 .build();
-        assertEquals(8d, e.evaluate(), 0d);
+        assertEquals(8d, e.evaluate().doubleValue(), 0d);
 
         e = new ExpressionBuilder("3!-2!")
                 .operator(factorial)
                 .build();
-        assertEquals(4d, e.evaluate(), 0d);
+        assertEquals(4d, e.evaluate().doubleValue(), 0d);
 
         e = new ExpressionBuilder("3!")
                 .operator(factorial)
                 .build();
-        assertEquals(6, e.evaluate(), 0);
+        assertEquals(6, e.evaluate().doubleValue(), 0);
 
         e = new ExpressionBuilder("3!!")
                 .operator(factorial)
                 .build();
-        assertEquals(720, e.evaluate(), 0);
+        assertEquals(720, e.evaluate().doubleValue(), 0);
 
         e = new ExpressionBuilder("4 + 3!")
                 .operator(factorial)
                 .build();
-        assertEquals(10, e.evaluate(), 0);
+        assertEquals(10, e.evaluate().doubleValue(), 0);
 
         e = new ExpressionBuilder("3! * 2")
                 .operator(factorial)
                 .build();
-        assertEquals(12, e.evaluate(), 0);
+        assertEquals(12, e.evaluate().doubleValue(), 0);
 
         e = new ExpressionBuilder("3!")
                 .operator(factorial)
                 .build();
         assertTrue(e.validate().isValid());
-        assertEquals(6, e.evaluate(), 0);
+        assertEquals(6, e.evaluate().doubleValue(), 0);
 
         e = new ExpressionBuilder("3!!")
                 .operator(factorial)
                 .build();
         assertTrue(e.validate().isValid());
-        assertEquals(720, e.evaluate(), 0);
+        assertEquals(720, e.evaluate().doubleValue(), 0);
 
         e = new ExpressionBuilder("4 + 3!")
                 .operator(factorial)
                 .build();
         assertTrue(e.validate().isValid());
-        assertEquals(10, e.evaluate(), 0);
+        assertEquals(10, e.evaluate().doubleValue(), 0);
 
         e = new ExpressionBuilder("3! * 2")
                 .operator(factorial)
                 .build();
         assertTrue(e.validate().isValid());
-        assertEquals(12, e.evaluate(), 0);
+        assertEquals(12, e.evaluate().doubleValue(), 0);
 
         e = new ExpressionBuilder("2 * 3!")
                 .operator(factorial)
                 .build();
         assertTrue(e.validate().isValid());
-        assertEquals(12, e.evaluate(), 0);
+        assertEquals(12, e.evaluate().doubleValue(), 0);
 
         e = new ExpressionBuilder("4 + (3!)")
                 .operator(factorial)
                 .build();
         assertTrue(e.validate().isValid());
-        assertEquals(10, e.evaluate(), 0);
+        assertEquals(10, e.evaluate().doubleValue(), 0);
 
         e = new ExpressionBuilder("4 + 3! + 2 * 6")
                 .operator(factorial)
                 .build();
         assertTrue(e.validate().isValid());
-        assertEquals(22, e.evaluate(), 0);
+        assertEquals(22, e.evaluate().doubleValue(), 0);
     }
 
     @Test
     public void testCotangent1() {
-        Expression e = new ExpressionBuilder("cot(1)")
+        final var e = new ExpressionBuilder("cot(1)")
                 .build();
-        assertEquals(1 / Math.tan(1), e.evaluate(), 0d);
+        assertEquals(1 / Math.tan(1), e.evaluate().doubleValue(), 0d);
 
     }
 
     @Test(expected = ArithmeticException.class)
     public void testInvalidCotangent1() {
-        Expression e = new ExpressionBuilder("cot(0)")
+        final var e = new ExpressionBuilder("cot(0)")
                 .build();
         e.evaluate();
 
@@ -175,86 +178,87 @@ public class ExpressionTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testOperatorFactorial2() {
-        Operator factorial = new Operator("!", 1, true, Operator.PRECEDENCE_POWER + 1) {
+        final var factorial = new Operator("!", 1, true, Operator.PRECEDENCE_POWER + 1) {
 
             @Override
-            public double apply(double... args) {
-                final int arg = (int) args[0];
-                if ((double) arg != args[0]) {
-                    throw new IllegalArgumentException("Operand for factorial has to be an integer");
-                }
-                if (arg < 0) {
-                    throw new IllegalArgumentException("The operand of the factorial can not be less than zero");
-                }
-                double result = 1;
-                for (int i = 1; i <= arg; i++) {
-                    result *= i;
+            public BigDecimal apply(final BigDecimal... args) {
+                final var arg = args[0].intValue();
+/*        if ((double) arg != args[0]) {
+          throw new IllegalArgumentException("Operand for factorial has to be an integer");
+        }
+        if (arg < 0) {
+          throw new IllegalArgumentException("The operand of the factorial can not be less than zero");
+        }
+ */
+                var result = BigDecimal.ONE;
+                for (var i = 1; i <= arg; i++) {
+                    result = result.multiply(BigDecimal.valueOf(i));
                 }
                 return result;
             }
         };
 
-        Expression e = new ExpressionBuilder("!3").build();
+        final var e = new ExpressionBuilder("!3").build();
         assertFalse(e.validate().isValid());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidFactorial2() {
-        Operator factorial = new Operator("!", 1, true, Operator.PRECEDENCE_POWER + 1) {
+        final var factorial = new Operator("!", 1, true, Operator.PRECEDENCE_POWER + 1) {
 
             @Override
-            public double apply(double... args) {
-                final int arg = (int) args[0];
-                if ((double) arg != args[0]) {
-                    throw new IllegalArgumentException("Operand for factorial has to be an integer");
-                }
-                if (arg < 0) {
-                    throw new IllegalArgumentException("The operand of the factorial can not be less than zero");
-                }
-                double result = 1;
-                for (int i = 1; i <= arg; i++) {
-                    result *= i;
+            public BigDecimal apply(final BigDecimal... args) {
+                final var arg = args[0].longValue();
+/*        if ((double) arg != args[0]) {
+          throw new IllegalArgumentException("Operand for factorial has to be an integer");
+        }
+        if (arg < 0) {
+          throw new IllegalArgumentException("The operand of the factorial can not be less than zero");
+        }
+ */
+                BigDecimal result = BigDecimal.ONE;
+                for (var i = 1; i <= arg; i++) {
+                    result = result.multiply(BigDecimal.valueOf(i));
                 }
                 return result;
             }
         };
 
-        Expression e = new ExpressionBuilder("!!3").build();
+        final var e = new ExpressionBuilder("!!3").build();
         assertFalse(e.validate().isValid());
     }
 
     @Test
     public void testClearVariables() {
-        ExpressionBuilder builder = new ExpressionBuilder("x + y");
+        final var builder = new ExpressionBuilder("x + y");
         builder.variable("x");
         builder.variable("y");
 
-        Expression expression = builder.build();
-        HashMap<String, Double> values = new HashMap<>();
-        values.put("x", 1.0);
-        values.put("y", 2.0);
+        final var expression = builder.build();
+        final var values = new HashMap<String, BigDecimal>();
+        values.put("x", BigDecimal.valueOf(1.0));
+        values.put("y", BigDecimal.valueOf(2.0));
         expression.setVariables(values);
 
-
-        double result = expression.evaluate();
+        double result = expression.evaluate().doubleValue();
         assertEquals(3.0, result, 3.0 - result);
 
         expression.clearVariables();
 
         try {
-            result = expression.evaluate();
+            result = expression.evaluate().doubleValue();
             fail("Should fail as there aren't values in the expression.");
-        } catch (Exception ignored) {
+        } catch (final Exception ignored) {
 
         }
 
-        HashMap<String, Double> emptyMap = new HashMap<>();
+        final var emptyMap = new HashMap<String, BigDecimal>();
         expression.setVariables(emptyMap);
 
         try {
-            result = expression.evaluate();
+            result = expression.evaluate().doubleValue();
             fail("Should fail as there aren't values in the expression.");
-        } catch (Exception ignored) {
+        } catch (final Exception ignored) {
 
         }
 
@@ -265,22 +269,21 @@ public class ExpressionTest {
     @Ignore
     // If Expression should be threads safe this test must pass
     public void evaluateFamily() {
-        final Expression e = new ExpressionBuilder("sin(x)")
+        final var e = new ExpressionBuilder("sin(x)")
                 .variable("x")
                 .build();
-        Executor executor = Executors.newFixedThreadPool(100);
-        for (int i = 0; i < 100000; i++) {
+        final Executor executor = Executors.newFixedThreadPool(100);
+        for (var i = 0; i < 100000; i++) {
             executor.execute(() -> {
-                double x = Math.random();
+                final var x = Math.random();
                 e.setVariable("x", x);
                 try {
                     Thread.sleep(100);
-                } catch (InterruptedException e1) {
+                } catch (final InterruptedException e1) {
                     e1.printStackTrace();
                 }
-                assertEquals(Math.sin(x), e.evaluate(), 0f);
+                assertEquals(Math.sin(x), e.evaluate().doubleValue(), 0f);
             });
         }
     }
 }
-

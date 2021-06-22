@@ -21,7 +21,10 @@ import net.objecthunter.exp4j.tokenizer.OperatorToken;
 import net.objecthunter.exp4j.tokenizer.Token;
 import net.objecthunter.exp4j.tokenizer.Tokenizer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
 /**
  * Shunting yard implementation to convert infix to reverse polish notation
@@ -40,12 +43,12 @@ public class ShuntingYard {
      */
     public static Token[] convertToRPN(final String expression, final Map<String, Function> userFunctions,
                                        final Map<String, Operator> userOperators, final Set<String> variableNames, final boolean implicitMultiplication) {
-        final Stack<Token> stack = new Stack<>();
-        final List<Token> output = new ArrayList<>();
+        final var stack = new Stack<Token>();
+        final var output = new ArrayList<Token>();
 
-        final Tokenizer tokenizer = new Tokenizer(expression, userFunctions, userOperators, variableNames, implicitMultiplication);
+        final var tokenizer = new Tokenizer(expression, userFunctions, userOperators, variableNames, implicitMultiplication);
         while (tokenizer.hasNext()) {
-            Token token = tokenizer.nextToken();
+            final var token = tokenizer.nextToken();
             switch (token.getType()) {
                 case Token.TOKEN_NUMBER:
                 case Token.TOKEN_VARIABLE:
@@ -55,18 +58,18 @@ public class ShuntingYard {
                     stack.add(token);
                     break;
                 case Token.TOKEN_SEPARATOR:
-                    while (!stack.empty() && stack.peek().getType() != Token.TOKEN_PARENTHESES_OPEN) {
+                    while (!stack.empty() && Token.TOKEN_PARENTHESES_OPEN != stack.peek().getType()) {
                         output.add(stack.pop());
                     }
-                    if (stack.empty() || stack.peek().getType() != Token.TOKEN_PARENTHESES_OPEN) {
+                    if (stack.empty() || Token.TOKEN_PARENTHESES_OPEN != stack.peek().getType()) {
                         throw new IllegalArgumentException("Misplaced function separator ',' or mismatched parentheses");
                     }
                     break;
                 case Token.TOKEN_OPERATOR:
-                    while (!stack.empty() && stack.peek().getType() == Token.TOKEN_OPERATOR) {
-                        OperatorToken o1 = (OperatorToken) token;
-                        OperatorToken o2 = (OperatorToken) stack.peek();
-                        if (o1.getOperator().getNumOperands() == 1 && o2.getOperator().getNumOperands() == 2) {
+                    while (!stack.empty() && Token.TOKEN_OPERATOR == stack.peek().getType()) {
+                        final var o1 = (OperatorToken) token;
+                        final var o2 = (OperatorToken) stack.peek();
+                        if (1 == o1.getOperator().getNumOperands() && 2 == o2.getOperator().getNumOperands()) {
                             break;
                         } else if ((o1.getOperator().isLeftAssociative() && o1.getOperator().getPrecedence() <= o2.getOperator().getPrecedence())
                                 || (o1.getOperator().getPrecedence() < o2.getOperator().getPrecedence())) {
@@ -81,11 +84,11 @@ public class ShuntingYard {
                     stack.push(token);
                     break;
                 case Token.TOKEN_PARENTHESES_CLOSE:
-                    while (stack.peek().getType() != Token.TOKEN_PARENTHESES_OPEN) {
+                    while (Token.TOKEN_PARENTHESES_OPEN != stack.peek().getType()) {
                         output.add(stack.pop());
                     }
                     stack.pop();
-                    if (!stack.isEmpty() && stack.peek().getType() == Token.TOKEN_FUNCTION) {
+                    if (!stack.isEmpty() && Token.TOKEN_FUNCTION == stack.peek().getType()) {
                         output.add(stack.pop());
                     }
                     break;
@@ -94,8 +97,8 @@ public class ShuntingYard {
             }
         }
         while (!stack.empty()) {
-            Token t = stack.pop();
-            if (t.getType() == Token.TOKEN_PARENTHESES_CLOSE || t.getType() == Token.TOKEN_PARENTHESES_OPEN) {
+            final var t = stack.pop();
+            if (Token.TOKEN_PARENTHESES_CLOSE == t.getType() || Token.TOKEN_PARENTHESES_OPEN == t.getType()) {
                 throw new IllegalArgumentException("Mismatched parentheses detected. Please check the expression");
             } else {
                 output.add(t);

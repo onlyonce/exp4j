@@ -15,48 +15,47 @@
  */
 package net.objecthunter.exp4j;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.ExecutorService;
+import java.math.BigDecimal;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static org.junit.Assert.assertEquals;
+class ConcurrencyTests {
 
-public class ConcurrencyTests {
+  @Test
+  void testFutureEvaluation() throws Exception {
+    final var exec = Executors.newFixedThreadPool(10);
+    final var numTests = 10000;
+    final var correct1 = new BigDecimal[numTests];
+    final var results1 = new Future[numTests];
+ 
+    final var correct2 = new BigDecimal[numTests];
+    final var results2 = new Future[numTests];
 
-    @Test
-    public void testFutureEvaluation() throws Exception {
-        ExecutorService exec = Executors.newFixedThreadPool(10);
-        int numTests = 10000;
-        double[] correct1 = new double[numTests];
-        Future[] results1 = new Future[numTests];
+    for (var i = 0; numTests > i; i++) {
+      correct1[i] = BigDecimal.valueOf(Math.sin(2 * Math.PI / (i + 1)));
+      results1[i] = new ExpressionBuilder("sin(2pi/(n+1))")
+              .variables("pi", "n")
+              .build()
+              .setVariable("pi", BigDecimal.valueOf(Math.PI))
+              .setVariable("n", BigDecimal.valueOf(i))
+              .evaluateAsync(exec);
 
-        double[] correct2 = new double[numTests];
-        Future[] results2 = new Future[numTests];
-
-        for (int i = 0; i < numTests; i++) {
-            correct1[i] = Math.sin(2 * Math.PI / (i + 1));
-            results1[i] = new ExpressionBuilder("sin(2pi/(n+1))")
-                    .variables("pi", "n")
-                    .build()
-                    .setVariable("pi", Math.PI)
-                    .setVariable("n", i)
-                    .evaluateAsync(exec);
-
-            correct2[i] = Math.log(Math.E * Math.PI * (i + 1));
-            results2[i] = new ExpressionBuilder("log(epi(n+1))")
-                    .variables("pi", "n", "e")
-                    .build()
-                    .setVariable("pi", Math.PI)
-                    .setVariable("e", Math.E)
-                    .setVariable("n", i)
-                    .evaluateAsync(exec);
-        }
-
-        for (int i = 0; i < numTests; i++) {
-            assertEquals(correct1[i], (Double) results1[i].get(), 0d);
-            assertEquals(correct2[i], (Double) results2[i].get(), 0d);
-        }
+      correct2[i] = BigDecimal.valueOf(Math.log(Math.E * Math.PI * (i + 1)));
+      results2[i] = new ExpressionBuilder("log(epi(n+1))")
+              .variables("pi", "n", "e")
+              .build()
+              .setVariable("pi", BigDecimal.valueOf(Math.PI))
+              .setVariable("e", BigDecimal.valueOf(Math.E))
+              .setVariable("n", BigDecimal.valueOf(i))
+              .evaluateAsync(exec);
     }
+
+    for (var i = 0; numTests > i; i++) {
+      Assertions.assertEquals(correct1[i].doubleValue(), ((BigDecimal) (results1[i].get())).doubleValue(), 0d);
+      Assertions.assertEquals(correct2[i].doubleValue(), ((BigDecimal) (results2[i].get())).doubleValue(), 0d);
+    }
+  }
 }

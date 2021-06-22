@@ -16,6 +16,8 @@
 
 package net.objecthunter.exp4j.function;
 
+import java.math.BigDecimal;
+
 /**
  * A class representing a Function which can be used in an expression
  */
@@ -31,8 +33,8 @@ public abstract class Function {
      * @param name         the name of the Function
      * @param numArguments the number of arguments the function takes
      */
-    public Function(String name, int numArguments) {
-        if (numArguments < 0) {
+    public Function(final String name, final int numArguments) {
+        if (0 > numArguments) {
             throw new IllegalArgumentException("The number of function arguments can not be less than 0 for '" +
                     name + "'");
         }
@@ -49,7 +51,7 @@ public abstract class Function {
      *
      * @param name the name of the Function
      */
-    public Function(String name) {
+    public Function(final String name) {
         this(name, 1);
     }
 
@@ -77,22 +79,22 @@ public abstract class Function {
      * @param args the set of arguments used for calculating the function
      * @return the result of the function evaluation
      */
-    public abstract double apply(double... args);
+    public abstract BigDecimal apply(BigDecimal... args);
 
     /**
      * Get the set of characters which are allowed for use in Function names.
      *
      * @return the set of characters allowed
-     * @deprecated since 0.4.5 All unicode letters are allowed to be used in function names since 0.4.3. This API
-     * Function can be safely ignored. Checks for function name validity can be done using Character.isLetter() et al.
+     * @deprecated since 0.4.5 All unicode letters are allowed to be used in function names since 0.4.3. This API Function can be safely
+     * ignored. Checks for function name validity can be done using Character.isLetter() et al.
      */
     public static char[] getAllowedFunctionCharacters() {
-        char[] chars = new char[53];
-        int count = 0;
-        for (int i = 65; i < 91; i++) {
+        final var chars = new char[53];
+        var count = 0;
+        for (var i = 65; 91 > i; i++) {
             chars[count++] = (char) i;
         }
-        for (int i = 97; i < 123; i++) {
+        for (var i = 97; 123 > i; i++) {
             chars[count++] = (char) i;
         }
         chars[count] = '_';
@@ -100,21 +102,21 @@ public abstract class Function {
     }
 
     public static boolean isValidFunctionName(final String name) {
-        if (name == null) {
+        if (null == name) {
             return false;
         }
 
-        final int size = name.length();
+        final var size = name.length();
 
-        if (size == 0) {
+        if (0 == size) {
             return false;
         }
 
-        for (int i = 0; i < size; i++) {
-            final char c = name.charAt(i);
-            if (Character.isLetter(c) || c == '_') {
+        for (var i = 0; i < size; i++) {
+            final var c = name.charAt(i);
+            if (Character.isLetter(c) || '_' == c) {
                 continue;
-            } else if (Character.isDigit(c) && i > 0) {
+            } else if (Character.isDigit(c) && 0 < i) {
                 continue;
             }
             return false;

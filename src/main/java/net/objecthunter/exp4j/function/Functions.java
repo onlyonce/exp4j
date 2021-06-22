@@ -15,6 +15,8 @@
  */
 package net.objecthunter.exp4j.function;
 
+import java.math.BigDecimal;
+
 /**
  * Class representing the builtin functions available for use in expressions
  */
@@ -57,214 +59,207 @@ public class Functions {
     static {
         BUILT_IN_FUNCTIONS[INDEX_SIN] = new Function("sin") {
             @Override
-            public double apply(double... args) {
-                return Math.sin(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.sin(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_COS] = new Function("cos") {
             @Override
-            public double apply(double... args) {
-                return Math.cos(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.cos(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_TAN] = new Function("tan") {
             @Override
-            public double apply(double... args) {
-                return Math.tan(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.tan(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_COT] = new Function("cot") {
             @Override
-            public double apply(double... args) {
-                double tan = Math.tan(args[0]);
-                if (tan == 0d) {
+            public BigDecimal apply(final BigDecimal... args) {
+                final var tan = Math.tan(args[0].doubleValue());
+                if (0d == tan) {
                     throw new ArithmeticException("Division by zero in cotangent!");
                 }
-                return 1d / tan;
+                return BigDecimal.valueOf(1d / tan);
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_LOG] = new Function("log") {
             @Override
-            public double apply(double... args) {
-                return Math.log(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.log(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_LOG2] = new Function("log2") {
             @Override
-            public double apply(double... args) {
-                return Math.log(args[0]) / Math.log(2d);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.log(args[0].doubleValue()) / Math.log(2d));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_LOG10] = new Function("log10") {
             @Override
-            public double apply(double... args) {
-                return Math.log10(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.log10(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_LOG1P] = new Function("log1p") {
             @Override
-            public double apply(double... args) {
-                return Math.log1p(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.log1p(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_ABS] = new Function("abs") {
             @Override
-            public double apply(double... args) {
-                return Math.abs(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.abs(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_ACOS] = new Function("acos") {
             @Override
-            public double apply(double... args) {
-                return Math.acos(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.acos(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_ASIN] = new Function("asin") {
             @Override
-            public double apply(double... args) {
-                return Math.asin(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.asin(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_ATAN] = new Function("atan") {
             @Override
-            public double apply(double... args) {
-                return Math.atan(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.atan(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_CBRT] = new Function("cbrt") {
             @Override
-            public double apply(double... args) {
-                return Math.cbrt(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.cbrt(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_FLOOR] = new Function("floor") {
             @Override
-            public double apply(double... args) {
-                return Math.floor(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.floor(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_SINH] = new Function("sinh") {
             @Override
-            public double apply(double... args) {
-                return Math.sinh(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.sinh(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_SQRT] = new Function("sqrt") {
             @Override
-            public double apply(double... args) {
-                return Math.sqrt(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.sqrt(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_TANH] = new Function("tanh") {
             @Override
-            public double apply(double... args) {
-                return Math.tanh(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.tanh(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_COSH] = new Function("cosh") {
             @Override
-            public double apply(double... args) {
-                return Math.cosh(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.cosh(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_CEIL] = new Function("ceil") {
             @Override
-            public double apply(double... args) {
-                return Math.ceil(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.ceil(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_POW] = new Function("pow", 2) {
             @Override
-            public double apply(double... args) {
-                return Math.pow(args[0], args[1]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.pow(args[0].doubleValue(), args[1].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_EXP] = new Function("exp", 1) {
             @Override
-            public double apply(double... args) {
-                return Math.exp(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.exp(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_EXPM1] = new Function("expm1", 1) {
             @Override
-            public double apply(double... args) {
-                return Math.expm1(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.expm1(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_SGN] = new Function("signum", 1) {
             @Override
-            public double apply(double... args) {
-                if (args[0] > 0) {
-                    return 1;
-                } else if (args[0] < 0) {
-                    return -1;
-                } else {
-                    return 0;
-                }
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf((double) args[0].signum());
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_CSC] = new Function("csc") {
             @Override
-            public double apply(double... args) {
-                double sin = Math.sin(args[0]);
-                if (sin == 0d) {
+            public BigDecimal apply(final BigDecimal... args) {
+                final var sin = Math.sin(args[0].doubleValue());
+                if (0d == sin) {
                     throw new ArithmeticException("Division by zero in cosecant!");
                 }
-                return 1d / sin;
+                return BigDecimal.valueOf(1d / sin);
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_SEC] = new Function("sec") {
             @Override
-            public double apply(double... args) {
-                double cos = Math.cos(args[0]);
-                if (cos == 0d) {
+            public BigDecimal apply(final BigDecimal... args) {
+                final var cos = Math.cos(args[0].doubleValue());
+                if (0d == cos) {
                     throw new ArithmeticException("Division by zero in secant!");
                 }
-                return 1d / cos;
+                return BigDecimal.valueOf(1d / cos);
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_CSCH] = new Function("csch") {
             @Override
-            public double apply(double... args) {
+            public BigDecimal apply(final BigDecimal... args) {
                 //this would throw an ArithmeticException later as sinh(0) = 0
-                if (args[0] == 0d) {
-                    return 0;
+                if (0 == BigDecimal.ZERO.compareTo(args[0])) {
+                    return BigDecimal.ZERO;
                 }
 
-                return 1d / Math.sinh(args[0]);
+                return BigDecimal.valueOf(1d / Math.sinh(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_SECH] = new Function("sech") {
             @Override
-            public double apply(double... args) {
-                return 1d / Math.cosh(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(1d / Math.cosh(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_COTH] = new Function("coth") {
             @Override
-            public double apply(double... args) {
-                return Math.cosh(args[0]) / Math.sinh(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.cosh(args[0].doubleValue()) / Math.sinh(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_LOGB] = new Function("logb", 2) {
             @Override
-            public double apply(double... args) {
-                return Math.log(args[1]) / Math.log(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.log(args[1].doubleValue()) / Math.log(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_TO_RADIAN] = new Function("toradian") {
             @Override
-            public double apply(double... args) {
-                return Math.toRadians(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.toRadians(args[0].doubleValue()));
             }
         };
         BUILT_IN_FUNCTIONS[INDEX_TO_DEGREE] = new Function("todegree") {
             @Override
-            public double apply(double... args) {
-                return Math.toDegrees(args[0]);
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.valueOf(Math.toDegrees(args[0].doubleValue()));
             }
         };
-
     }
 
     /**
@@ -340,5 +335,4 @@ public class Functions {
                 return null;
         }
     }
-
 }

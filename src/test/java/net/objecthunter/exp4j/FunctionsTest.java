@@ -18,85 +18,87 @@ package net.objecthunter.exp4j;
 import net.objecthunter.exp4j.function.Function;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
 public class FunctionsTest {
+
     @Test(expected = IllegalArgumentException.class)
     public void testFunctionNameNull() {
-        Function f = new Function(null) {
+        final var f = new Function(null) {
             @Override
-            public double apply(double... args) {
-                return 0;
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.ZERO;
             }
         };
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFunctionNameEmpty() {
-        Function f = new Function("") {
+        final var f = new Function("") {
             @Override
-            public double apply(double... args) {
-                return 0;
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.ZERO;
             }
         };
     }
 
     @Test
     public void testFunctionNameZeroArgs() {
-        Function f = new Function("foo", 0) {
+        final var f = new Function("foo", 0) {
             @Override
-            public double apply(double... args) {
-                return 0;
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.ZERO;
             }
         };
-        assertEquals(0f, f.apply(), 0f);
+        assertEquals(0f, f.apply().doubleValue(), 0f);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFunctionNameNegativeArgs() {
-        Function f = new Function("foo", -1) {
+        final var f = new Function("foo", -1) {
             @Override
-            public double apply(double... args) {
-                return 0;
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.ZERO;
             }
         };
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testIllegalFunctionName1() {
-        Function f = new Function("1foo") {
+        final var f = new Function("1foo") {
             @Override
-            public double apply(double... args) {
-                return 0;
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.ZERO;
             }
         };
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testIllegalFunctionName2() {
-        Function f = new Function("_&oo") {
+        final var f = new Function("_&oo") {
             @Override
-            public double apply(double... args) {
-                return 0;
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.ZERO;
             }
         };
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testIllegalFunctionName3() {
-        Function f = new Function("o+o") {
+        final var f = new Function("o+o") {
             @Override
-            public double apply(double... args) {
-                return 0;
+            public BigDecimal apply(final BigDecimal... args) {
+                return BigDecimal.ZERO;
             }
         };
     }
 
     @Test
     public void testGetAllowedFunctionChars() {
-        char[] chars = Function.getAllowedFunctionCharacters();
+        final var chars = Function.getAllowedFunctionCharacters();
         assertEquals(53, chars.length);
         Arrays.sort(chars);
         assertTrue(Arrays.binarySearch(chars, 'a') > -1);

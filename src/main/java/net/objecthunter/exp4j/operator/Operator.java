@@ -15,10 +15,13 @@
  */
 package net.objecthunter.exp4j.operator;
 
+import java.math.BigDecimal;
+
 /**
  * Class representing operators that can be used in an expression
  */
 public abstract class Operator {
+
     /**
      * The precedence value for the addition operation
      */
@@ -71,8 +74,8 @@ public abstract class Operator {
      * @param leftAssociative  set to true if the operator is left associative, false if it is right associative
      * @param precedence       the precedence value of the operator
      */
-    public Operator(String symbol, int numberOfOperands, boolean leftAssociative,
-                    int precedence) {
+    public Operator(final String symbol, final int numberOfOperands, final boolean leftAssociative,
+                    final int precedence) {
         super();
         this.numOperands = numberOfOperands;
         this.leftAssociative = leftAssociative;
@@ -86,8 +89,8 @@ public abstract class Operator {
      * @param ch the char to check
      * @return true if the char is allowed an an operator symbol, false otherwise
      */
-    public static boolean isAllowedOperatorChar(char ch) {
-        for (char allowed : ALLOWED_OPERATOR_CHARS) {
+    public static boolean isAllowedOperatorChar(final char ch) {
+        for (final var allowed : ALLOWED_OPERATOR_CHARS) {
             if (ch == allowed) {
                 return true;
             }
@@ -119,7 +122,7 @@ public abstract class Operator {
      * @param args the operands for the operation
      * @return the calculated result of the operation
      */
-    public abstract double apply(double... args);
+    public abstract BigDecimal apply(BigDecimal... args);
 
     /**
      * Get the operator symbol

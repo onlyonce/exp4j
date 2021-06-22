@@ -26,17 +26,14 @@ import static org.junit.Assert.*;
  */
 public class ArrayStackTest {
 
-    public ArrayStackTest() {
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor() {
-        ArrayStack stack = new ArrayStack(-1);
+        new ArrayStack(-1);
     }
 
     @Test
     public void testPushNoSize() {
-        ArrayStack stack = new ArrayStack();
+        final var stack = new ArrayStack();
 
         stack.push(0);
         stack.push(1);
@@ -47,9 +44,9 @@ public class ArrayStackTest {
 
     @Test
     public void testPushLessSize() {
-        ArrayStack stack = new ArrayStack(5);
+        final var stack = new ArrayStack(5);
 
-        for (int i = 0; i < 5; i++) {
+        for (var i = 0; 5 > i; i++) {
             stack.push(i);
         }
 
@@ -58,41 +55,41 @@ public class ArrayStackTest {
 
     @Test
     public void testPeek() {
-        ArrayStack stack = new ArrayStack(5);
+        final var stack = new ArrayStack(5);
 
-        for (int i = 0; i < 5; i++) {
+        for (var i = 0; 5 > i; i++) {
             stack.push(i);
         }
 
-        assertEquals(4d, stack.peek(), 0d);
-        assertEquals(4d, stack.peek(), 0d);
-        assertEquals(4d, stack.peek(), 0d);
+        assertEquals(4d, stack.peek().doubleValue(), 0d);
+        assertEquals(4d, stack.peek().doubleValue(), 0d);
+        assertEquals(4d, stack.peek().doubleValue(), 0d);
     }
 
     @Test
     public void testPeek2() {
-        ArrayStack stack = new ArrayStack(5);
+        final var stack = new ArrayStack(5);
         stack.push(-1);
         double old = -1;
-        for (int i = 0; i < 5; i++) {
-            assertEquals(old, stack.peek(), 0d);
+        for (var i = 0; 5 > i; i++) {
+            assertEquals(old, stack.peek().doubleValue(), 0d);
             stack.push(i);
             old = i;
-            assertEquals(old, stack.peek(), 0d);
+            assertEquals(old, stack.peek().doubleValue(), 0d);
         }
     }
 
     @Test(expected = EmptyStackException.class)
     public void testPeekNoData() {
-        ArrayStack stack = new ArrayStack(5);
+        final var stack = new ArrayStack(5);
         stack.peek();
     }
 
     @Test
     public void testPop() {
-        ArrayStack stack = new ArrayStack(5);
+        final var stack = new ArrayStack(5);
 
-        for (int i = 0; i < 5; i++) {
+        for (var i = 0; 5 > i; i++) {
             stack.push(i);
         }
 
@@ -103,9 +100,9 @@ public class ArrayStackTest {
 
     @Test(expected = EmptyStackException.class)
     public void testPop2() {
-        ArrayStack stack = new ArrayStack(5);
+        final var stack = new ArrayStack(5);
 
-        for (int i = 0; i < 5; i++) {
+        for (var i = 0; 5 > i; i++) {
             stack.push(i);
         }
 
@@ -116,12 +113,12 @@ public class ArrayStackTest {
 
     @Test
     public void testPop3() {
-        ArrayStack stack = new ArrayStack(5);
+        final var stack = new ArrayStack(5);
 
-        for (int i = 0; i < 5; i++) {
+        for (var i = 0; 5 > i; i++) {
             stack.push(i);
             assertEquals(1, stack.size());
-            assertEquals(i, stack.pop(), 0d);
+            assertEquals(i, stack.pop().doubleValue(), 0d);
         }
 
         assertEquals(0, stack.size());
@@ -130,13 +127,13 @@ public class ArrayStackTest {
 
     @Test(expected = EmptyStackException.class)
     public void testPopNoData() {
-        ArrayStack stack = new ArrayStack(5);
+        final var stack = new ArrayStack(5);
         stack.pop();
     }
 
     @Test
     public void testIsEmpty() {
-        ArrayStack stack = new ArrayStack(5);
+        final var stack = new ArrayStack(5);
         assertTrue(stack.isEmpty());
         stack.push(4);
         assertFalse(stack.isEmpty());
@@ -158,7 +155,7 @@ public class ArrayStackTest {
 
     @Test
     public void testSize() {
-        ArrayStack stack = new ArrayStack(5);
+        final var stack = new ArrayStack(5);
         assertEquals(0, stack.size());
         stack.push(4);
         assertEquals(1, stack.size());

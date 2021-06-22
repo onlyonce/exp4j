@@ -16,16 +16,17 @@
 
 package net.objecthunter.exp4j;
 
+import java.math.BigDecimal;
 import java.util.EmptyStackException;
 
 /**
- * Simple double stack using a double array as data storage
+ * Simple BigDecimal stack using a BigDecimal array as data storage
  *
  * @author Federico Vera (dktcoding [at] gmail)
  */
 class ArrayStack {
 
-    private double[] data;
+    private BigDecimal[] data;
 
     private int idx;
 
@@ -33,19 +34,19 @@ class ArrayStack {
         this(5);
     }
 
-    ArrayStack(int initialCapacity) {
-        if (initialCapacity <= 0) {
+    ArrayStack(final int initialCapacity) {
+        if (0 >= initialCapacity) {
             throw new IllegalArgumentException(
                     "Stack's capacity must be positive");
         }
 
-        data = new double[initialCapacity];
+        data = new BigDecimal[initialCapacity];
         idx = -1;
     }
 
-    void push(double value) {
+    void push(final BigDecimal value) {
         if (idx + 1 == data.length) {
-            double[] temp = new double[(int) (data.length * 1.2) + 1];
+            final var temp = new BigDecimal[(int) (data.length * 1.2) + 1];
             System.arraycopy(data, 0, temp, 0, data.length);
             data = temp;
         }
@@ -53,22 +54,34 @@ class ArrayStack {
         data[++idx] = value;
     }
 
-    double peek() {
-        if (idx == -1) {
+    void push(final double value) {
+        push(BigDecimal.valueOf(value));
+    }
+
+    void push(final int value) {
+        push(BigDecimal.valueOf(value));
+    }
+
+    void push(final long value) {
+        push(BigDecimal.valueOf(value));
+    }
+
+    BigDecimal peek() {
+        if (-1 == idx) {
             throw new EmptyStackException();
         }
         return data[idx];
     }
 
-    double pop() {
-        if (idx == -1) {
+    BigDecimal pop() {
+        if (-1 == idx) {
             throw new EmptyStackException();
         }
         return data[idx--];
     }
 
     boolean isEmpty() {
-        return idx == -1;
+        return -1 == idx;
     }
 
     int size() {

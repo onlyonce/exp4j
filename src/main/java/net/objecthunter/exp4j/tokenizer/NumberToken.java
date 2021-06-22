@@ -15,24 +15,32 @@
  */
 package net.objecthunter.exp4j.tokenizer;
 
+import java.math.BigDecimal;
+
 /**
  * Represents a number in the expression
  */
 public final class NumberToken extends Token {
-    private final double value;
+
+    private final BigDecimal value;
 
     /**
      * Create a new instance
      *
      * @param value the value of the number
      */
-    public NumberToken(double value) {
+    public NumberToken(final BigDecimal value) {
         super(TOKEN_NUMBER);
         this.value = value;
     }
 
+    public NumberToken(final double value) {
+        super(TOKEN_NUMBER);
+        this.value = BigDecimal.valueOf(value);
+    }
+
     NumberToken(final char[] expression, final int offset, final int len) {
-        this(Double.parseDouble(String.valueOf(expression, offset, len)));
+        this(new BigDecimal(String.valueOf(expression, offset, len)));
     }
 
     /**
@@ -40,7 +48,7 @@ public final class NumberToken extends Token {
      *
      * @return the value
      */
-    public double getValue() {
+    public BigDecimal getValue() {
         return value;
     }
 }

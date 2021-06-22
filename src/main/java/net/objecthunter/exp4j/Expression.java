@@ -15,11 +15,10 @@
  */
 package net.objecthunter.exp4j;
 
-import net.objecthunter.exp4j.function.Function;
 import net.objecthunter.exp4j.function.Functions;
-import net.objecthunter.exp4j.operator.Operator;
 import net.objecthunter.exp4j.tokenizer.*;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -28,16 +27,16 @@ public class Expression {
 
     private final Token[] tokens;
 
-    private final Map<String, Double> variables;
+    private final Map<String, BigDecimal> variables;
 
     private final Set<String> userFunctionNames;
 
-    private static Map<String, Double> createDefaultVariables() {
-        final Map<String, Double> vars = new HashMap<>(4);
-        vars.put("pi", Math.PI);
-        vars.put("π", Math.PI);
-        vars.put("φ", 1.61803398874d);
-        vars.put("e", Math.E);
+    private static Map<String, BigDecimal> createDefaultVariables() {
+        final var vars = new HashMap<String, BigDecimal>(4);
+        vars.put("pi", BigDecimal.valueOf(Math.PI));
+        vars.put("π", BigDecimal.valueOf(Math.PI));
+        vars.put("φ", BigDecimal.valueOf(1.61803398874d));
+        vars.put("e", BigDecimal.valueOf(Math.E));
         return vars;
     }
 
@@ -59,26 +58,38 @@ public class Expression {
         this.userFunctionNames = Collections.emptySet();
     }
 
-    Expression(final Token[] tokens, Set<String> userFunctionNames) {
+    Expression(final Token[] tokens, final Set<String> userFunctionNames) {
         this.tokens = tokens;
         this.variables = createDefaultVariables();
         this.userFunctionNames = userFunctionNames;
     }
 
-    public Expression setVariable(final String name, final double value) {
+    public Expression setVariable(final String name, final BigDecimal value) {
         this.checkVariableName(name);
         this.variables.put(name, value);
         return this;
     }
 
-    private void checkVariableName(String name) {
-        if (this.userFunctionNames.contains(name) || Functions.getBuiltinFunction(name) != null) {
+    public Expression setVariable(final String name, final double value) {
+        this.checkVariableName(name);
+        this.variables.put(name, BigDecimal.valueOf(value));
+        return this;
+    }
+
+    public Expression setVariable(final String name, final int value) {
+        this.checkVariableName(name);
+        this.variables.put(name, BigDecimal.valueOf(value));
+        return this;
+    }
+
+    private void checkVariableName(final String name) {
+        if (this.userFunctionNames.contains(name) || null != Functions.getBuiltinFunction(name)) {
             throw new IllegalArgumentException("The variable name '" + name + "' is invalid. Since there exists a function with the same name");
         }
     }
 
-    public Expression setVariables(Map<String, Double> variables) {
-        for (Map.Entry<String, Double> v : variables.entrySet()) {
+    public Expression setVariables(final Map<String, BigDecimal> variables) {
+        for (final var v : variables.entrySet()) {
             this.setVariable(v.getKey(), v.getValue());
         }
         return this;
@@ -91,20 +102,21 @@ public class Expression {
 
     public Set<String> getVariableNames() {
         final Set<String> variables = new HashSet<>();
-        for (final Token t : tokens) {
-            if (t.getType() == Token.TOKEN_VARIABLE)
+        for (final var t : tokens) {
+            if (Token.TOKEN_VARIABLE == t.getType()) {
                 variables.add(((VariableToken) t).getName());
+            }
         }
         return variables;
     }
 
-    public ValidationResult validate(boolean checkVariablesSet) {
+    public ValidationResult validate(final boolean checkVariablesSet) {
         final List<String> errors = new ArrayList<>(0);
         if (checkVariablesSet) {
             /* check that all vars have a value set */
-            for (final Token t : this.tokens) {
-                if (t.getType() == Token.TOKEN_VARIABLE) {
-                    final String var = ((VariableToken) t).getName();
+            for (final var t : this.tokens) {
+                if (Token.TOKEN_VARIABLE == t.getType()) {
+                    final var var = ((VariableToken) t).getName();
                     if (!variables.containsKey(var)) {
                         errors.add("The setVariable '" + var + "' has not been set");
                     }
@@ -118,42 +130,42 @@ public class Expression {
            than or equals to the function's expected number of arguments.
            The count has to be larger than 1 at all times and exactly 1 after all tokens
            have been processed */
-        int count = 0;
-        for (Token tok : this.tokens) {
+        var count = 0;
+        for (final var tok : this.tokens) {
             switch (tok.getType()) {
                 case Token.TOKEN_NUMBER:
                 case Token.TOKEN_VARIABLE:
                     count++;
                     break;
                 case Token.TOKEN_FUNCTION:
-                    final Function func = ((FunctionToken) tok).getFunction();
-                    final int argsNum = func.getNumArguments();
+                    final var func = ((FunctionToken) tok).getFunction();
+                    final var argsNum = func.getNumArguments();
                     if (argsNum > count) {
                         errors.add("Not enough arguments for '" + func.getName() + "'");
                     }
-                    if (argsNum > 1) {
+                    if (1 < argsNum) {
                         count -= argsNum - 1;
-                    } else if (argsNum == 0) {
+                    } else if (0 == argsNum) {
                         // see https://github.com/fasseg/exp4j/issues/59
                         count++;
                     }
                     break;
                 case Token.TOKEN_OPERATOR:
-                    Operator op = ((OperatorToken) tok).getOperator();
-                    if (op.getNumOperands() == 2) {
+                    final var op = ((OperatorToken) tok).getOperator();
+                    if (2 == op.getNumOperands()) {
                         count--;
                     }
                     break;
             }
-            if (count < 1) {
+            if (1 > count) {
                 errors.add("Too many operators");
                 return new ValidationResult(false, errors);
             }
         }
-        if (count > 1) {
+        if (1 < count) {
             errors.add("Too many operands");
         }
-        return errors.size() == 0 ? ValidationResult.SUCCESS : new ValidationResult(false, errors);
+        return errors.isEmpty() ? ValidationResult.SUCCESS : new ValidationResult(false, errors);
 
     }
 
@@ -161,53 +173,54 @@ public class Expression {
         return validate(true);
     }
 
-    public Future<Double> evaluateAsync(ExecutorService executor) {
+    public Future<BigDecimal> evaluateAsync(final ExecutorService executor) {
         return executor.submit(this::evaluate);
     }
 
-    public double evaluate() {
-        final ArrayStack output = new ArrayStack();
-        for (Token t : tokens) {
-            if (t.getType() == Token.TOKEN_NUMBER) {
+    public BigDecimal evaluate() {
+        final var output = new ArrayStack();
+        for (final var t : tokens) {
+            if (Token.TOKEN_NUMBER == t.getType()) {
                 output.push(((NumberToken) t).getValue());
-            } else if (t.getType() == Token.TOKEN_VARIABLE) {
-                final String name = ((VariableToken) t).getName();
-                final Double value = this.variables.get(name);
-                if (value == null) {
+            } else if (Token.TOKEN_VARIABLE == t.getType()) {
+                final var name = ((VariableToken) t).getName();
+                final var value = this.variables.get(name);
+                if (null == value) {
                     throw new IllegalArgumentException("No value has been set for the setVariable '" + name + "'.");
                 }
                 output.push(value);
-            } else if (t.getType() == Token.TOKEN_OPERATOR) {
-                OperatorToken op = (OperatorToken) t;
+            } else if (Token.TOKEN_OPERATOR == t.getType()) {
+                final var op = (OperatorToken) t;
                 if (output.size() < op.getOperator().getNumOperands()) {
                     throw new IllegalArgumentException("Invalid number of operands available for '" + op.getOperator().getSymbol() + "' operator");
                 }
-                if (op.getOperator().getNumOperands() == 2) {
+                if (2 == op.getOperator().getNumOperands()) {
                     /* pop the operands and push the result of the operation */
-                    double rightArg = output.pop();
-                    double leftArg = output.pop();
+                    final var rightArg = output.pop();
+                    final var leftArg = output.pop();
                     output.push(op.getOperator().apply(leftArg, rightArg));
-                } else if (op.getOperator().getNumOperands() == 1) {
+                } else if (1 == op.getOperator().getNumOperands()) {
                     /* pop the operand and push the result of the operation */
-                    double arg = output.pop();
+                    final var arg = output.pop();
                     output.push(op.getOperator().apply(arg));
                 }
-            } else if (t.getType() == Token.TOKEN_FUNCTION) {
-                FunctionToken func = (FunctionToken) t;
-                final int numArguments = func.getFunction().getNumArguments();
+            } else if (Token.TOKEN_FUNCTION == t.getType()) {
+                final var func = (FunctionToken) t;
+                final var numArguments = func.getFunction().getNumArguments();
                 if (output.size() < numArguments) {
                     throw new IllegalArgumentException("Invalid number of arguments available for '" + func.getFunction().getName() + "' function");
                 }
                 /* collect the arguments from the stack */
-                double[] args = new double[numArguments];
-                for (int j = numArguments - 1; j >= 0; j--) {
+                final var args = new BigDecimal[numArguments];
+                for (var j = numArguments - 1; 0 <= j; j--) {
                     args[j] = output.pop();
                 }
                 output.push(func.getFunction().apply(args));
             }
         }
-        if (output.size() > 1) {
-            throw new IllegalArgumentException("Invalid number of items on the output queue. Might be caused by an invalid number of arguments for a function.");
+        if (1 < output.size()) {
+            throw new IllegalArgumentException(
+                    "Invalid number of items on the output queue. Might be caused by an invalid number of arguments for a function.");
         }
         return output.pop();
     }

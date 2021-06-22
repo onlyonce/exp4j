@@ -21,6 +21,7 @@ import java.util.List;
  * Contains the validation result for a given {@link Expression}
  */
 public class ValidationResult {
+
     private final boolean valid;
     private final List<String> errors;
 
@@ -30,7 +31,7 @@ public class ValidationResult {
      * @param valid  Whether the validation of the expression was successful
      * @param errors The list of errors returned if the validation was unsuccessful
      */
-    public ValidationResult(boolean valid, List<String> errors) {
+    public ValidationResult(final boolean valid, final List<String> errors) {
         this.valid = valid;
         this.errors = errors;
     }
